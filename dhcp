@@ -1,17 +1,1 @@
-# Get the network adapter details
-$adapter = Get-NetAdapter | Where-Object {$_.InterfaceDescription -match "Ethernet"}
 
-# Get the DHCP assigned IP configuration
-$dhcpAddress = $adapter | Get-NetIPAddress -AddressFamily IPv4 | Where-Object {$_.PrefixOrigin -eq "Dhcp"}
-
-# Define the static IP address details
-$ipAddress = $dhcpAddress.IPAddress
-$subnetMask = $dhcpAddress.SubnetMask
-$gateway = $dhcpAddress.PrefixOriginPolicy.NextHop
-$dnsDomain = "example.com" # Replace with your actual DNS domain name
-
-# Convert DHCP reservation to static IP address
-Set-NetIPAddress -InterfaceAlias $adapter.Name -IPAddress $ipAddress -PrefixLength $subnetMask
-Set-NetIPInterface -InterfaceAlias $adapter.Name -AddressFamily IPv4 -SkipDefaultGateway $false
-New-NetRoute -InterfaceAlias $adapter.Name -DestinationPrefix "0.0.0.0/0" -NextHop $gateway
-Set-DnsClientServerAddress -InterfaceAlias $adapter.Name -ServerAddresses $dnsDomain
