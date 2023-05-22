@@ -1,0 +1,15 @@
+$domainControllers = Get-ADDomainController -Filter *
+
+$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+$logPath = "C:\temp\log.txt"
+
+foreach ($dc in $domainControllers) {
+    $dcName = $dc.Name
+    $pingResult = Test-Connection -ComputerName $dcName -Count 1 -Quiet
+
+    if (-not $pingResult) {
+        $logEntry = "$dcName - $timestamp - No response"
+        Add-Content -Path $logPath -Value $logEntry
+    }
+}
