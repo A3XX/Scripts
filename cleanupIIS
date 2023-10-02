@@ -1,0 +1,19 @@
+# Define the path to the IIS log files
+$logFolderPath = "C:\inetpub\logs\LogFiles\"
+
+# Get the current date
+$currentDate = Get-Date
+
+# Calculate the date 7 days ago
+$sevenDaysAgo = $currentDate.AddDays(-7)
+
+# Get a list of log files older than 7 days
+$oldLogFiles = Get-ChildItem -Path $logFolderPath -File | Where-Object { $_.LastWriteTime -lt $sevenDaysAgo }
+
+# Delete log files older than 7 days
+foreach ($logFile in $oldLogFiles) {
+    Write-Output "Deleting $($logFile.FullName)"
+    Remove-Item -Path $logFile.FullName -Force
+}
+
+Write-Output "Old log files older than 7 days have been deleted."
